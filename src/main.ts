@@ -1,15 +1,9 @@
-import {
-  App,
-  MarkdownView,
-  Modal,
-  Plugin,
-  PluginSettingTab,
-  Setting,
-} from 'obsidian';
+import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, ViewPlugin, Decoration } from '@codemirror/view';
-import nlp from 'compromise/two';
+import { MatchTextModal } from './modal';
+import { getMatchRanges } from './utils';
 import type { PluginValue, DecorationSet, PluginSpec } from '@codemirror/view';
-import type { MatchSyntaxPluginSettings, IOffsetOutput, IRange } from './types';
+import type { MatchSyntaxPluginSettings, IRange } from './types';
 
 const DEFAULT_SETTINGS: MatchSyntaxPluginSettings = {
   showHighlightsOnReadingView: false,
@@ -42,24 +36,8 @@ export default class MatchSyntaxPlugin extends Plugin {
             cm6Editor = markdownView.editor.cm;
             const plugin = cm6Editor.plugin(highlightViewPlugin);
             const docEl = cm6Editor.state.doc;
-            const lineCount = docEl.lines;
-            const ranges: IRange[] = [];
             new MatchTextModal(this.app, (textToMatch) => {
-              for (let lineIdx = 0; lineIdx < lineCount; lineIdx++) {
-                // Line numbers are 1-based
-                const lineObj = docEl.line(lineIdx + 1);
-                const doc = nlp(lineObj.text);
-                const m: IOffsetOutput[] = doc.match(textToMatch).out('offset');
-                for (const matchEl of m) {
-                  ranges.push({
-                    from: lineObj.from + matchEl.offset.start,
-                    to:
-                      lineObj.from +
-                      matchEl.offset.start +
-                      matchEl.offset.length,
-                  });
-                }
-              }
+              const ranges = getMatchRanges(docEl, textToMatch);
               if (plugin) {
                 plugin.makeDeco(ranges);
               }
@@ -102,36 +80,6 @@ export default class MatchSyntaxPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
-  }
-}
-
-class MatchTextModal extends Modal {
-  constructor(app: App, onSubmit: (textToMatch: string) => void) {
-    super(app);
-    this.setTitle('Enter match syntax: ');
-
-    let matchStr = '';
-    const settingContent = this.contentEl;
-
-    const matchInput = new Setting(settingContent);
-    matchInput.setClass('match-input-setting');
-    matchInput.addText((text) => {
-      text.inputEl.addClass('match-input');
-      text.setPlaceholder('#adverb+ good...');
-      text.onChange((value) => {
-        matchStr = value;
-      });
-    });
-
-    new Setting(settingContent).addButton((btn) =>
-      btn
-        .setButtonText('Find matches')
-        .setCta()
-        .onClick(() => {
-          this.close();
-          onSubmit(matchStr);
-        })
-    );
   }
 }
 
