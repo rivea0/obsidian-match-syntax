@@ -1,0 +1,11 @@
+.highlight-text {
+  background-color: var(--text-highlight-bg);
+}
+
+.match-input-setting {
+  display: block;
+}
+
+.match-input {
+  width: 100%;
+}

@@ -1,0 +1,1 @@
+# MatchSyntax for Obsidian
