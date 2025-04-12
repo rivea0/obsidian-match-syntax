@@ -1,4 +1,4 @@
-import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, ViewPlugin, Decoration } from '@codemirror/view';
 import { MatchTextModal } from './modal';
 import { getMatchRanges } from './utils';
@@ -6,7 +6,7 @@ import type { PluginValue, DecorationSet, PluginSpec } from '@codemirror/view';
 import type { MatchSyntaxPluginSettings, IRange } from './types';
 
 const DEFAULT_SETTINGS: MatchSyntaxPluginSettings = {
-  showHighlightsOnReadingView: false,
+  showNumberOfMatchesNotification: false,
 };
 
 export default class MatchSyntaxPlugin extends Plugin {
@@ -15,7 +15,6 @@ export default class MatchSyntaxPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
     this.addSettingTab(new MatchSyntaxSettingTab(this.app, this));
-    console.log(this.settings.showHighlightsOnReadingView);
 
     const highlightViewPlugin = ViewPlugin.fromClass(
       HighlighterPlugin,
@@ -40,6 +39,9 @@ export default class MatchSyntaxPlugin extends Plugin {
               const ranges = getMatchRanges(docEl, textToMatch);
               if (plugin) {
                 plugin.makeDeco(ranges);
+              }
+              if (this.settings.showNumberOfMatchesNotification) {
+                new Notice(`${ranges.length} matches found.`);
               }
             }).open();
           }
@@ -97,13 +99,13 @@ class MatchSyntaxSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName('Show highlights on reading view')
-      .setDesc('The match results will show both in editing and reading views')
+      .setName('Notify the number of matches found')
+      .setDesc('The number of match results will be shown in a notification when you search for a match syntax')
       .addToggle((toggle) => {
         toggle
-          .setValue(this.plugin.settings.showHighlightsOnReadingView)
+          .setValue(this.plugin.settings.showNumberOfMatchesNotification)
           .onChange(async (value) => {
-            this.plugin.settings.showHighlightsOnReadingView = value;
+            this.plugin.settings.showNumberOfMatchesNotification = value;
             await this.plugin.saveSettings();
           });
       });

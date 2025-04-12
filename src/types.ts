@@ -1,5 +1,5 @@
 export interface MatchSyntaxPluginSettings {
-  showHighlightsOnReadingView: boolean;
+  showNumberOfMatchesNotification: boolean;
 }
 
 export interface IOffsetOutput {
