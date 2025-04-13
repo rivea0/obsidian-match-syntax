@@ -6,7 +6,7 @@ import type { PluginValue, DecorationSet, PluginSpec } from '@codemirror/view';
 import type { MatchSyntaxPluginSettings, IRange } from './types';
 
 const DEFAULT_SETTINGS: MatchSyntaxPluginSettings = {
-  showNumberOfMatchesNotification: false,
+  showNumberOfMatchesNotification: true,
 };
 
 export default class MatchSyntaxPlugin extends Plugin {
