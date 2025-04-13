@@ -21,7 +21,7 @@ export default defineConfig(async ({ mode }) => {
       },
       minify: prod,
       sourcemap: prod ? false : 'inline',
-      outDir: './',
+      outDir: '.',
       cssCodeSplit: false,
       emptyOutDir: false,
       rollupOptions: {
