@@ -38,7 +38,8 @@ export default class MatchSyntaxPlugin extends Plugin {
               plugin.makeDeco(ranges);
             }
             if (this.settings.showNumberOfMatchesNotification) {
-              new Notice(`${ranges.length} matches found.`);
+              const numberOfMatches = ranges.length
+              new Notice(`${numberOfMatches} match${numberOfMatches === 1 ? '' : 'es'} found.`);
             }
           }).open();
         }
