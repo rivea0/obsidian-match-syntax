@@ -3,7 +3,7 @@
 	"name": "MatchSyntax",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "A regex-like, human-readable lookups for your notes.",
+	"description": "A flexible, regex-like lookups for your notes.",
 	"author": "Eda",
 	"authorUrl": "https://rivea0.github.io",
 	"isDesktopOnly": false

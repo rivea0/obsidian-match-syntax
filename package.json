@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-match-syntax",
 	"version": "1.0.0",
-	"description": "A regex-like, human-readable lookups for your notes.",
+	"description": "A flexible, regex-like lookups for your notes.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "vite build --mode development --watch",
