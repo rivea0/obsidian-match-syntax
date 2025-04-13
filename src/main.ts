@@ -1,4 +1,4 @@
-import { App, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, ViewPlugin, Decoration } from '@codemirror/view';
 import { MatchTextModal } from './modal';
 import { getMatchRanges } from './utils';
@@ -25,50 +25,42 @@ export default class MatchSyntaxPlugin extends Plugin {
     this.addCommand({
       id: 'enter-match-syntax',
       name: 'Enter match syntax',
-      checkCallback: (checking: boolean) => {
-        const markdownView =
-          this.app.workspace.getActiveViewOfType(MarkdownView);
+      editorCheckCallback: (checking, editor, ctx) => {
         let cm6Editor: EditorView;
-        if (markdownView) {
-          if (!checking) {
-            // @ts-expect-error
-            cm6Editor = markdownView.editor.cm;
-            const plugin = cm6Editor.plugin(highlightViewPlugin);
-            const docEl = cm6Editor.state.doc;
-            new MatchTextModal(this.app, (textToMatch) => {
-              const ranges = getMatchRanges(docEl, textToMatch);
-              if (plugin) {
-                plugin.makeDeco(ranges);
-              }
-              if (this.settings.showNumberOfMatchesNotification) {
-                new Notice(`${ranges.length} matches found.`);
-              }
-            }).open();
-          }
-          return true;
+        if (!checking) {
+          // @ts-expect-error
+          cm6Editor = ctx.editor.cm;
+          const plugin = cm6Editor.plugin(highlightViewPlugin);
+          const docEl = cm6Editor.state.doc;
+          new MatchTextModal(this.app, (textToMatch) => {
+            const ranges = getMatchRanges(docEl, textToMatch);
+            if (plugin) {
+              plugin.makeDeco(ranges);
+            }
+            if (this.settings.showNumberOfMatchesNotification) {
+              new Notice(`${ranges.length} matches found.`);
+            }
+          }).open();
         }
+        return true;
       },
     });
 
     this.addCommand({
       id: 'clear-match-highlights',
       name: 'Clear match highlights',
-      checkCallback: (checking: boolean) => {
-        const markdownView =
-          this.app.workspace.getActiveViewOfType(MarkdownView);
+      editorCheckCallback: (checking, editor, ctx) => {
         let cm6Editor: EditorView;
-        if (markdownView) {
-          if (!checking) {
-            // @ts-expect-error
-            cm6Editor = markdownView.editor.cm;
-            const plugin = cm6Editor.plugin(highlightViewPlugin);
-            if (plugin) {
-              plugin.clearDeco();
-            }
+        if (!checking) {
+          // @ts-expect-error
+          cm6Editor = ctx.editor.cm;
+          const plugin = cm6Editor.plugin(highlightViewPlugin);
+          if (plugin) {
+            plugin.clearDeco();
           }
-          return true;
         }
-      },
+        return true;
+      }
     });
   }
 
@@ -100,7 +92,9 @@ class MatchSyntaxSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Notify the number of matches found')
-      .setDesc('The number of match results will be shown in a notification when you search for a match syntax')
+      .setDesc(
+        'The number of match results will be shown in a notification when you search for a match syntax'
+      )
       .addToggle((toggle) => {
         toggle
           .setValue(this.plugin.settings.showNumberOfMatchesNotification)
