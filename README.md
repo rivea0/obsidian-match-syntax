@@ -12,17 +12,13 @@ https://github.com/user-attachments/assets/ff264c14-853b-473a-8b8d-c3d76994bd9a
 
 You can do regex searches with `//` syntax. Let's say we want to look for any word that starts with `natur` and is followed by either `e` or `al`:
 
-<!-- regex-match-video -->
-
---TODO--
+https://github.com/user-attachments/assets/f10bc077-7240-44c4-8aa0-0d332e20dcb6
 
 _It's always advised to be careful with regex. This will also be slower than other types of lookups._
 
 MatchSyntax is flexible, so you can combine different types of matches. Let's say we first searched for all nouns that are followed after the word "spiritual." Then, we might realize we don't want the plural nouns. So instead, we can use an AND syntax (`&&`) and negative matching (`!`) to indicate we want to exclude plural nouns:
 
-<!-- complex-example-with-negative-match-video -->
-
---TODO--
+https://github.com/user-attachments/assets/89b3b70b-a7f9-47c8-b542-c88d7200d301
 
 > [!NOTE]
 > MatchSyntax heavily depends on the [`compromise` library](https://github.com/spencermountain/compromise). The matching works only with English grammar; although `compromise` has some "work-in-progress" for other languages, there is only English support for this plugin at the moment.
