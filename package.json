@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-match-syntax",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A flexible, regex-like lookups for your notes.",
 	"main": "main.js",
 	"scripts": {
