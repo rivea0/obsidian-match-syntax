@@ -9,9 +9,9 @@ export class MatchTextModal extends Modal {
     const settingContent = this.contentEl;
 
     const matchInput = new Setting(settingContent);
-    matchInput.setClass('match-input-setting');
+    matchInput.setClass('match-syntax-input-setting');
     matchInput.addText((text) => {
-      text.inputEl.addClass('match-input');
+      text.inputEl.addClass('match-syntax-input-element');
       text.setPlaceholder('#adverb+ good...');
       text.onChange((value) => {
         matchStr = value;

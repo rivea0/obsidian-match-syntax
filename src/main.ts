@@ -110,7 +110,7 @@ class HighlighterPlugin implements PluginValue {
   makeDeco(ranges: IRange[]) {
     const deco = [];
     const highlightDeco = Decoration.mark({
-      class: 'highlight-text',
+      class: 'match-syntax-highlight-text',
       attributes: { 'data-contents': 'string' },
     });
 
