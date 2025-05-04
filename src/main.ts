@@ -25,48 +25,42 @@ export default class MatchSyntaxPlugin extends Plugin {
     this.addCommand({
       id: 'enter-match-syntax',
       name: 'Enter match syntax',
-      editorCheckCallback: (checking, editor, ctx) => {
-        let cm6Editor: EditorView;
-        if (!checking) {
-          // @ts-expect-error
-          cm6Editor = ctx.editor.cm;
-          const plugin = cm6Editor.plugin(highlightViewPlugin);
-          const docEl = cm6Editor.state.doc;
-          new MatchTextModal(this.app, (textToMatch) => {
-            const ranges = getMatchRanges(docEl, textToMatch);
-            if (plugin) {
-              plugin.makeDeco(ranges);
-            }
-            if (this.settings.showNumberOfMatchesNotification) {
-              const numberOfMatches = ranges.length
-              new Notice(`${numberOfMatches} match${numberOfMatches === 1 ? '' : 'es'} found.`);
-            }
-          }).open();
-        }
-        return true;
+      editorCallback: (editor) => {
+        // @ts-expect-error
+        const cm6Editor: EditorView = editor.cm;
+        const plugin = cm6Editor.plugin(highlightViewPlugin);
+        const docEl = cm6Editor.state.doc;
+        new MatchTextModal(this.app, (textToMatch) => {
+          const ranges = getMatchRanges(docEl, textToMatch);
+          if (plugin) {
+            plugin.makeDeco(ranges);
+          }
+          if (this.settings.showNumberOfMatchesNotification) {
+            const numberOfMatches = ranges.length
+            new Notice(`${numberOfMatches} match${numberOfMatches === 1 ? '' : 'es'} found.`);
+          }
+        }).open();
       },
     });
 
     this.addCommand({
       id: 'clear-match-highlights',
       name: 'Clear match highlights',
-      editorCheckCallback: (checking, editor, ctx) => {
-        let cm6Editor: EditorView;
-        if (!checking) {
-          // @ts-expect-error
-          cm6Editor = ctx.editor.cm;
-          const plugin = cm6Editor.plugin(highlightViewPlugin);
-          if (plugin) {
-            plugin.clearDeco();
-          }
+      editorCallback: (editor) => {
+        // @ts-expect-error
+        const cm6Editor: EditorView = editor.cm;
+        const plugin = cm6Editor.plugin(highlightViewPlugin);
+        if (plugin) {
+          plugin.clearDeco();
         }
-        return true;
       }
     });
   }
 
   onunload() {
-    console.log('unloading plugin');
+    if (import.meta.env.MODE === 'development') {
+      console.log('unloading plugin');
+    }
   }
 
   async loadSettings() {
