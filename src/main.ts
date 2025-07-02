@@ -2,12 +2,15 @@ import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, ViewPlugin, Decoration } from '@codemirror/view';
 import { MatchTextModal } from './modal';
 import { getMatchRanges } from './utils';
+import MatchSyntaxString from './syntaxObj';
 import type { PluginValue, DecorationSet, PluginSpec } from '@codemirror/view';
 import type { MatchSyntaxPluginSettings, IRange } from './types';
 
 const DEFAULT_SETTINGS: MatchSyntaxPluginSettings = {
   showNumberOfMatchesNotification: true,
 };
+
+const SYNTAX = new MatchSyntaxString();
 
 export default class MatchSyntaxPlugin extends Plugin {
   settings: MatchSyntaxPluginSettings;
@@ -31,7 +34,8 @@ export default class MatchSyntaxPlugin extends Plugin {
         const plugin = cm6Editor.plugin(highlightViewPlugin);
         const docEl = cm6Editor.state.doc;
         new MatchTextModal(this.app, (textToMatch) => {
-          const ranges = getMatchRanges(docEl, textToMatch);
+          SYNTAX.setValue(textToMatch);
+          const ranges = getMatchRanges(docEl, SYNTAX.getValue());
           if (plugin) {
             plugin.makeDeco(ranges);
           }
@@ -54,6 +58,7 @@ export default class MatchSyntaxPlugin extends Plugin {
           if (plugin.decorations === Decoration.none) {
             new Notice('No decorations found!');
           } else {
+            SYNTAX.clearValue();
             plugin.clearDeco();
           }
         }
@@ -62,6 +67,7 @@ export default class MatchSyntaxPlugin extends Plugin {
   }
 
   onunload() {
+    SYNTAX.clearValue();
     if (import.meta.env.MODE === 'development') {
       console.log('unloading plugin');
     }
