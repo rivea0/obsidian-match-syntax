@@ -51,7 +51,11 @@ export default class MatchSyntaxPlugin extends Plugin {
         const cm6Editor: EditorView = editor.cm;
         const plugin = cm6Editor.plugin(highlightViewPlugin);
         if (plugin) {
-          plugin.clearDeco();
+          if (plugin.decorations === Decoration.none) {
+            new Notice('No decorations found!');
+          } else {
+            plugin.clearDeco();
+          }
         }
       }
     });
@@ -106,7 +110,6 @@ class HighlighterPlugin implements PluginValue {
   constructor(view: EditorView) {
     this.decorations = Decoration.none;
   }
-
   makeDeco(ranges: IRange[]) {
     const deco = [];
     const highlightDeco = Decoration.mark({
