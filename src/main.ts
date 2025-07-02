@@ -3,7 +3,7 @@ import { EditorView, ViewPlugin, Decoration } from '@codemirror/view';
 import { MatchTextModal } from './modal';
 import { getMatchRanges } from './utils';
 import MatchSyntaxString from './syntaxObj';
-import type { PluginValue, DecorationSet, PluginSpec } from '@codemirror/view';
+import type { PluginValue, DecorationSet, PluginSpec, ViewUpdate } from '@codemirror/view';
 import type { MatchSyntaxPluginSettings, IRange } from './types';
 
 const DEFAULT_SETTINGS: MatchSyntaxPluginSettings = {
@@ -116,6 +116,17 @@ class HighlighterPlugin implements PluginValue {
   constructor(view: EditorView) {
     this.decorations = Decoration.none;
   }
+
+  update(viewUpdate: ViewUpdate) {
+    if (viewUpdate.docChanged) {
+      if (this.decorations !== Decoration.none) {
+        const docEl = viewUpdate.view.state.doc;
+        const ranges = getMatchRanges(docEl, SYNTAX.getValue());
+        this.makeDeco(ranges);
+      }
+    }
+  }
+
   makeDeco(ranges: IRange[]) {
     const deco = [];
     const highlightDeco = Decoration.mark({
@@ -131,6 +142,10 @@ class HighlighterPlugin implements PluginValue {
 
   clearDeco() {
     this.decorations = Decoration.none;
+  }
+
+  destroy() {
+    this.clearDeco();
   }
 }
 
