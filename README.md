@@ -197,7 +197,7 @@ You can choose "Enter match syntax" to write your syntax and click "Find matches
 
 You can bind hotkeys for the commands by going to **Community plugins**, find MatchSyntax in Installed Plugins, and choosing "Hotkeys" button.
 
-At the moment, highlights will stay until you explicitly clear them.
+Highlights are cleared automatically when there is a change in editor. You can override this behavior by setting "Manually clear the highlights" on inside plugin settings.
 
 ### TODO and Ideas
 - Custom tags

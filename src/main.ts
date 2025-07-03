@@ -1,13 +1,20 @@
-import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Notice, Plugin } from 'obsidian';
 import { EditorView, ViewPlugin, Decoration } from '@codemirror/view';
 import { MatchTextModal } from './modal';
 import { getMatchRanges } from './utils';
 import MatchSyntaxString from './syntaxObj';
-import type { PluginValue, DecorationSet, PluginSpec, ViewUpdate } from '@codemirror/view';
+import type {
+  PluginValue,
+  DecorationSet,
+  PluginSpec,
+  ViewUpdate,
+} from '@codemirror/view';
 import type { MatchSyntaxPluginSettings, IRange } from './types';
+import { keepHighlights, MatchSyntaxSettingTab } from './settings';
 
 const DEFAULT_SETTINGS: MatchSyntaxPluginSettings = {
   showNumberOfMatchesNotification: true,
+  manuallyClearHighlights: false,
 };
 
 const SYNTAX = new MatchSyntaxString();
@@ -40,8 +47,12 @@ export default class MatchSyntaxPlugin extends Plugin {
             plugin.makeDeco(ranges);
           }
           if (this.settings.showNumberOfMatchesNotification) {
-            const numberOfMatches = ranges.length
-            new Notice(`${numberOfMatches} match${numberOfMatches === 1 ? '' : 'es'} found.`);
+            const numberOfMatches = ranges.length;
+            new Notice(
+              `${numberOfMatches} match${
+                numberOfMatches === 1 ? '' : 'es'
+              } found.`
+            );
           }
         }).open();
       },
@@ -56,13 +67,13 @@ export default class MatchSyntaxPlugin extends Plugin {
         const plugin = cm6Editor.plugin(highlightViewPlugin);
         if (plugin) {
           if (plugin.decorations === Decoration.none) {
-            new Notice('No decorations found!');
+            new Notice('No highlights found!');
           } else {
             SYNTAX.clearValue();
             plugin.clearDeco();
           }
         }
-      }
+      },
     });
   }
 
@@ -82,35 +93,6 @@ export default class MatchSyntaxPlugin extends Plugin {
   }
 }
 
-class MatchSyntaxSettingTab extends PluginSettingTab {
-  plugin: MatchSyntaxPlugin;
-
-  constructor(app: App, plugin: MatchSyntaxPlugin) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new Setting(containerEl)
-      .setName('Notify the number of matches found')
-      .setDesc(
-        'The number of match results will be shown in a notification when you search for a match syntax'
-      )
-      .addToggle((toggle) => {
-        toggle
-          .setValue(this.plugin.settings.showNumberOfMatchesNotification)
-          .onChange(async (value) => {
-            this.plugin.settings.showNumberOfMatchesNotification = value;
-            await this.plugin.saveSettings();
-          });
-      });
-  }
-}
-
 class HighlighterPlugin implements PluginValue {
   decorations: DecorationSet;
   constructor(view: EditorView) {
@@ -120,9 +102,14 @@ class HighlighterPlugin implements PluginValue {
   update(viewUpdate: ViewUpdate) {
     if (viewUpdate.docChanged) {
       if (this.decorations !== Decoration.none) {
-        const docEl = viewUpdate.view.state.doc;
-        const ranges = getMatchRanges(docEl, SYNTAX.getValue());
-        this.makeDeco(ranges);
+        if (!keepHighlights) {
+          SYNTAX.clearValue();
+          this.clearDeco();
+        } else {
+          const docEl = viewUpdate.view.state.doc;
+          const ranges = getMatchRanges(docEl, SYNTAX.getValue());
+          this.makeDeco(ranges);
+        }
       }
     }
   }
