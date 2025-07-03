@@ -66,7 +66,7 @@ export default class MatchSyntaxPlugin extends Plugin {
         const cm6Editor: EditorView = editor.cm;
         const plugin = cm6Editor.plugin(highlightViewPlugin);
         if (plugin) {
-          if (plugin.decorations === Decoration.none) {
+          if (!plugin.decoExists()) {
             new Notice('No highlights found!');
           } else {
             SYNTAX.clearValue();
@@ -101,7 +101,7 @@ class HighlighterPlugin implements PluginValue {
 
   update(viewUpdate: ViewUpdate) {
     if (viewUpdate.docChanged) {
-      if (this.decorations !== Decoration.none) {
+      if (this.decoExists()) {
         if (!keepHighlights) {
           SYNTAX.clearValue();
           this.clearDeco();
@@ -125,6 +125,10 @@ class HighlighterPlugin implements PluginValue {
       deco.push(highlightDeco.range(rangeObj.from, rangeObj.to));
     }
     this.decorations = Decoration.set(deco);
+  }
+
+  decoExists() {
+    return this.decorations !== Decoration.none;
   }
 
   clearDeco() {
