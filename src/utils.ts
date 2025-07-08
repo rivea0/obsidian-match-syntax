@@ -26,7 +26,13 @@ function getMatchOffsets(
   matchSyntax: string
 ): IOffsetOutput[] {
   const doc = nlp(docText);
-  const results = doc.match(matchSyntax).out('offset');
+  const results: IOffsetOutput[] = doc.match(matchSyntax).out('offset');
 
-  return results;
+  return filterEmptyMatches(results);
+}
+
+function filterEmptyMatches(offsetsResult: IOffsetOutput[]) {
+  return offsetsResult.filter(
+    (result: IOffsetOutput) => result.offset.length !== 0
+  );
 }
