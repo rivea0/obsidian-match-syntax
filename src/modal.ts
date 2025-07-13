@@ -1,9 +1,23 @@
 import { App, Modal, Setting } from 'obsidian';
+import type { KeymapEventHandler } from 'obsidian';
 
 export class MatchTextModal extends Modal {
+  #keymapEvtHandler: KeymapEventHandler | null = null;
   constructor(app: App, onSubmit: (textToMatch: string) => void) {
     super(app);
     this.setTitle('Enter match syntax: ');
+    this.#keymapEvtHandler = this.scope.register([], 'Enter', (evt: KeyboardEvent) => {
+      if (evt.isComposing) {
+        return;
+      }
+      evt.preventDefault();
+      const findMatchesBtn = document
+        .getElementsByClassName('mod-cta')
+        .item(0) as HTMLButtonElement | null;
+      if (findMatchesBtn) {
+        findMatchesBtn.click();
+      }
+    });
 
     let matchStr = '';
     const settingContent = this.contentEl;
@@ -27,5 +41,12 @@ export class MatchTextModal extends Modal {
           onSubmit(matchStr);
         })
     );
+  }
+
+  onClose(): void {
+    if (this.#keymapEvtHandler) {
+      this.scope.unregister(this.#keymapEvtHandler);
+      this.#keymapEvtHandler = null;
+    }
   }
 }
